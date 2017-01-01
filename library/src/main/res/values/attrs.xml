@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MagicFlyLinearLayout">
+        <attr name="flyAnimatorType">
+            <enum name="B2TScatter" value="0"/>
+            <enum name="T2BRainNormal" value="1"/>
+        </attr>
+        <attr name="flyDuration" format="integer"/>
+    </declare-styleable>
+</resources>
