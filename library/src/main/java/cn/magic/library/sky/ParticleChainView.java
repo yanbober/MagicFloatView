@@ -72,6 +72,8 @@ public class ParticleChainView extends SurfaceView implements SurfaceHolder.Call
         mHolder.addCallback(this);
 
         mParticlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mParticlePaint.setStrokeJoin(Paint.Join.ROUND);
+        mParticlePaint.setStrokeCap(Paint.Cap.ROUND);
         mTouchPoint = new Point();
     }
 
