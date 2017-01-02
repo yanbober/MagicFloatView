@@ -7,27 +7,63 @@
     android:layout_height="match_parent"
     tools:context="cn.magic.magicfloatview.MainActivity">
 
-    <cn.magic.library.MagicFlyLinearLayout
-        android:id="@+id/gift_layout"
-        app:flyAnimatorType="T2BRainNormal"
-        app:flyDuration="4000"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="10dp">
-
-    </cn.magic.library.MagicFlyLinearLayout>
-
-    <Button
-        android:id="@+id/btn"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Like"/>
-
-    <cn.magic.library.sky.ParticleChainView
+    <cn.magic.magicfloatview.sky.ParticleChainView
         android:id="@+id/ParticleChainView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <cn.magic.library.MagicFlyLinearLayout
+        android:id="@+id/gift_layout"
+        app:flyAnimatorType="T2BRainNormal"
+        app:flyDuration="3000"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="20dp"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/icon_auther"/>
+            <EditText
+                android:layout_marginTop="10dp"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:text="demo"
+                android:background="@android:color/darker_gray"/>
+            <EditText
+                android:layout_marginTop="10dp"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:text="demo"
+                android:background="@android:color/darker_gray"/>
+        </LinearLayout>
+        <Button
+            android:id="@+id/gift_btn"
+            android:text="祝福雨"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </cn.magic.library.MagicFlyLinearLayout>
+
+    <cn.magic.library.MagicFlyLinearLayout
+        android:id="@+id/fly_layout"
+        app:flyAnimatorType="B2TScatter"
+        app:flyDuration="4000"
+        android:layout_width="200dp"
+        android:layout_height="800dp"
+        android:orientation="vertical"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:gravity="bottom|center_horizontal">
+        <Button
+            android:id="@+id/fly_btn"
+            android:text="点赞啦"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </cn.magic.library.MagicFlyLinearLayout>
 </RelativeLayout>

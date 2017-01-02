@@ -21,14 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package cn.magic.library.sky;
+package cn.magic.magicfloatview.sky;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -36,9 +39,11 @@ import android.view.SurfaceView;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import cn.magic.magicfloatview.R;
 
 /**
  * A particle chain view, particle chain changed by touch event.
+ * @TODO only a demo view.
  */
 
 public class ParticleChainView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
@@ -48,6 +53,7 @@ public class ParticleChainView extends SurfaceView implements SurfaceHolder.Call
 
     private List<RandomParticle> mRandomParticles;
     private Paint mParticlePaint;
+    private Bitmap mBgBitmap;
 
     private Point mTouchPoint;
 
@@ -75,22 +81,25 @@ public class ParticleChainView extends SurfaceView implements SurfaceHolder.Call
         mParticlePaint.setStrokeJoin(Paint.Join.ROUND);
         mParticlePaint.setStrokeCap(Paint.Cap.ROUND);
         mTouchPoint = new Point();
+
+        mBgBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.sky_bg);
+        //TODO need support attr.
     }
 
     @Override
     public void run() {
         while (mDrawThreadRunning) {
-            Canvas canvas = null;
-            try {
-                synchronized (mHolder) {
+            synchronized (mHolder) {
+                Canvas canvas = null;
+                try {
                     canvas = mHolder.lockCanvas();
                     loopDraw(canvas);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                if (mHolder != null) {
-                    mHolder.unlockCanvasAndPost(canvas);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (mHolder != null && mHolder.getSurface().isValid()) {
+                        mHolder.unlockCanvasAndPost(canvas);
+                    }
                 }
             }
         }
@@ -98,6 +107,8 @@ public class ParticleChainView extends SurfaceView implements SurfaceHolder.Call
 
     private void loopDraw(Canvas canvas) {
         canvas.drawColor(Color.BLACK);
+        Rect dst = new Rect(0, 0, getMeasuredWidth(), getMeasuredHeight());
+        canvas.drawBitmap(mBgBitmap, null, dst, null);
         List<RandomParticle> lines = new ArrayList<>();
         for (int index=0; mRandomParticles != null && index<mRandomParticles.size(); index++) {
             RandomParticle particle = mRandomParticles.get(index);
@@ -110,9 +121,9 @@ public class ParticleChainView extends SurfaceView implements SurfaceHolder.Call
             for (int jdex=0; jdex<lines.size(); jdex++) {
                 RandomParticle particle1 = lines.get(index);
                 RandomParticle particle2 = lines.get(jdex);
-                if (doubleParticleDistance(particle1, particle2) < 100
+                if (doubleParticleDistance(particle1, particle2) < 150
                         && doubleParticleDistance(particle1, particle2) > 0) {
-                    int lineColor = Color.argb(255, new Random().nextInt(255), new Random().nextInt(255), new Random().nextInt(255));
+                    int lineColor = Color.argb(120, new Random().nextInt(255), new Random().nextInt(255), new Random().nextInt(255));
                     mParticlePaint.setStrokeWidth(8);
                     mParticlePaint.setColor(lineColor);
                     canvas.drawLine(particle1.positionX, particle1.positionY,
@@ -155,9 +166,12 @@ public class ParticleChainView extends SurfaceView implements SurfaceHolder.Call
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        //TODO default position.
+        mTouchPoint.x = getMeasuredWidth() / 2;
+        mTouchPoint.y = getMeasuredHeight() / 2;
         mRandomParticles = new ArrayList<>();
         for (int index=0 ;index<250; index++) {
-            RandomParticle particle = new RandomParticle();
+            RandomParticle particle = new RandomParticle(getMeasuredWidth(), getMeasuredHeight());
             mRandomParticles.add(particle);
         }
     }
@@ -184,14 +198,26 @@ public class ParticleChainView extends SurfaceView implements SurfaceHolder.Call
     }
 
     public static class RandomParticle {
-        public int radius = randomRange(10, 15);
-        public int color = Color.argb(randomRange(156, 255), randomRange(0, 255), randomRange(0, 255), randomRange(0, 255));
+        public int radius;
+        public int color;
 
-        public int positionX = randomRange(this.radius, 1024 - this.radius);
-        public int positionY = randomRange(this.radius, 2048 - this.radius);
+        public int positionX;
+        public int positionY;
 
-        public int speedDirectionX = randomRange(0, 5) * (new Random().nextBoolean() ? 1 : -1);
-        public int speedDirectionY = randomRange(0, 5) * (new Random().nextBoolean() ? 1 : -1);
+        public int speedDirectionX;
+        public int speedDirectionY;
+
+        private Point mMeasurePoint;
+
+        public RandomParticle(int width, int heigh) {
+            this.mMeasurePoint = new Point(width, heigh);
+            this.radius = randomRange(10, 15);
+            this.color = Color.argb(randomRange(156, 255), randomRange(0, 255), randomRange(0, 255), randomRange(0, 255));
+            this.positionX = randomRange(this.radius, this.mMeasurePoint.x - this.radius);
+            this.positionY = randomRange(this.radius, this.mMeasurePoint.y - this.radius);
+            this.speedDirectionX = randomRange(0, 5) * (new Random().nextBoolean() ? 1 : -1);
+            this.speedDirectionY = randomRange(0, 5) * (new Random().nextBoolean() ? 1 : -1);
+        }
 
         public void move() {
             this.positionX += this.speedDirectionX;
@@ -201,16 +227,16 @@ public class ParticleChainView extends SurfaceView implements SurfaceHolder.Call
                 this.positionX = this.radius;
                 this.speedDirectionX *= -1;
             }
-            if (this.positionX >= 1024 - this.radius) {
-                this.positionX = 1024 - this.radius;
+            if (this.positionX >= this.mMeasurePoint.x - this.radius) {
+                this.positionX = this.mMeasurePoint.x - this.radius;
                 this.speedDirectionX *= -1;
             }
             if (this.positionY <= this.radius) {
                 this.positionY = this.radius;
                 this.speedDirectionY *= -1;
             }
-            if (this.positionY >= 2048 - this.radius) {
-                this.positionY = 2048 - this.radius;
+            if (this.positionY >= this.mMeasurePoint.y - this.radius) {
+                this.positionY = this.mMeasurePoint.y - this.radius;
                 this.speedDirectionY *= -1;
             }
         }

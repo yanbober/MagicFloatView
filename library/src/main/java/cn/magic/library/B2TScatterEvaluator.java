@@ -80,7 +80,7 @@ public class B2TScatterEvaluator extends AbsAnimatorEvaluator {
         valueState.bitmap = getBitmap();
         valueState.alpha = 255;
         valueState.scale = 0.1f;
-        valueState.pointF = new PointF(getMeasuredWith() / 2, getMeasuredHeigh());
+        valueState.pointF = new PointF(getMeasuredWith() / 2, getMeasuredHeigh() - getBitmap().getHeight() / 2);
         return valueState;
     }
 
